@@ -1,5 +1,3 @@
-## This file is a bad way of managing context. 
-
 from pathlib import Path
 from ollama import chat
 
@@ -13,18 +11,27 @@ but my phone still works.
 
 context = ""
 
+# Read every .txt file in knowledge/ — this is the "bad" approach
 for file in Path("knowledge").glob("*.txt"):
     context += file.read_text()
     context += "\n\n"
 
-## Make a call to Qwen with student's question and the context from the knowledge base.
-
-
-
-## Just for fun, print the total length of the context
-print(
-    "Context characters:",
-    len(context)
+# Ask Qwen
+response = chat(
+    model="qwen2.5:7b",
+    messages=[
+        {
+            "role": "user",
+            "content": (
+                f"Student question:\n{question}\n\n"
+                f"Context:\n{context}"
+            )
+        }
+    ]
 )
 
-## Print the response from Qwen
+# See how large the context is
+print("Context characters:", len(context))
+
+# Print the answer
+print(response.message.content)
